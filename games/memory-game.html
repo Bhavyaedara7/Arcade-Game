@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f8ff;
+        }
+        #game-board {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            grid-gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .card {
+            width: 100px;
+            height: 100px;
+            background-color: #fff;
+            border: 2px solid #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            cursor: pointer;
+        }
+        .hidden {
+            background-color: #ccc;
+        }
+        #status {
+            font-size: 1.2rem;
+            margin-top: 20px;
+        }
+        #restart {
+            margin-top: 10px;
+            padding: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Memory Game - Match the Emojis! 🎴</h1>
+    <div id="game-board"></div>
+    <p id="status"></p>
+    <button id="restart">Restart Game</button>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const emojis = ['🍎', '🍎', '🚗', '🚗', '🐶', '🐶', '🎩', '🎩', '⚽', '⚽', '🎸', '🎸', '💡', '💡', '📚', '📚'];
+            let shuffledEmojis = emojis.sort(() => 0.5 - Math.random());
+            let selectedCards = [];
+            let matchedPairs = 0;
+            const gameBoard = document.getElementById("game-board");
+            const statusText = document.getElementById("status");
+
+            function createBoard() {
+                gameBoard.innerHTML = "";
+                shuffledEmojis.forEach((emoji, index) => {
+                    const card = document.createElement("div");
+                    card.classList.add("card", "hidden");
+                    card.dataset.index = index;
+                    card.dataset.emoji = emoji;
+                    card.addEventListener("click", flipCard);
+                    gameBoard.appendChild(card);
+                });
+            }
+
+            function flipCard(event) {
+                let card = event.target;
+                if (!card.classList.contains("hidden") || selectedCards.length >= 2) return;
+                
+                card.innerText = card.dataset.emoji;
+                card.classList.remove("hidden");
+                selectedCards.push(card);
+
+                if (selectedCards.length === 2) {
+                    setTimeout(checkMatch, 500);
+                }
+            }
+
+            function checkMatch() {
+                const [card1, card2] = selectedCards;
+                if (card1.dataset.emoji === card2.dataset.emoji) {
+                    card1.removeEventListener("click", flipCard);
+                    card2.removeEventListener("click", flipCard);
+                    matchedPairs++;
+                    if (matchedPairs === emojis.length / 2) {
+                        statusText.innerText = "You win! 🎉";
+                    }
+                } else {
+                    card1.innerText = "";
+                    card2.innerText = "";
+                    card1.classList.add("hidden");
+                    card2.classList.add("hidden");
+                }
+                selectedCards = [];
+            }
+
+            document.getElementById("restart").addEventListener("click", () => {
+                shuffledEmojis = emojis.sort(() => 0.5 - Math.random());
+                matchedPairs = 0;
+                statusText.innerText = "";
+                createBoard();
+            });
+
+            createBoard();
+        });
+    </script>
+</body>
+</html>

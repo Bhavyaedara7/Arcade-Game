@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game</title>
+    <link rel="stylesheet" href="style.css" />
+    <script type="module" src="./firebase.js"></script>
+    <script type="module" src="./auth.js"></script>
+    <script type="module" src="./game.js"></script>
+
+</head>
+<body>
+    <header>
+        <h1> Welcome to the 
+            <span style="cursor: pointer; color: #ff4040; text-decoration: underline;" onclick="location.reload()">Random</span> 
+            Game Arcade! 🎮</h1>
+    </header>
+
+    <nav>
+        <button id="hamburger-menu">☰</button>
+        <div id="menu-content" style="display: none;">
+            <p id="user-info"></p>
+            <button id="logout-btn">Logout</button>
+        </div>
+    </nav>
+
+    <div id="game-container">
+        <div class="game-content">
+            Your Game Will Load Here!
+        </div>
+    </div>
+    <ul id="scoreboard"></ul>
+
+    <script type="module">
+        import { logout } from "./auth.js";
+        document.getElementById("logout-btn").addEventListener("click", logout);
+
+        document.getElementById("hamburger-menu").addEventListener("click", () => {
+            const menu = document.getElementById("menu-content");
+            menu.style.display = menu.style.display === "none" ? "block" : "none";
+        });
+    </script>
+    <script>
+        const games = [
+            'games/tic-tac-toe.html',
+            'games/rock-paper-scissors.html',
+            'games/memory-game.html',
+            'games/dino.html'
+        ];
+    
+        function loadRandomGame() {
+            const randomGame = games[Math.floor(Math.random() * games.length)];
+            document.getElementById('game-container').innerHTML = `<iframe src="${randomGame}" frameborder="0" width="100%" height="500px"></iframe>`;
+        }
+    
+        function showGameSection() {
+            document.getElementById("game-section").style.display = "block";
+            loadRandomGame();  // Load game after showing the section
+        }
+    </script>
+</body>
+</html>

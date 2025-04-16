@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dinosaur Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+        }
+        .game-container {
+            position: relative;
+            width: 600px;
+            height: 200px;
+            margin: auto;
+            border: 2px solid black;
+            overflow: hidden;
+            background-color: white;
+        }
+        .dino {
+            width: 40px;
+            height: 40px;
+            background-color: green;
+            position: absolute;
+            bottom: 0;
+            left: 50px;
+        }
+        .obstacle {
+            width: 20px;
+            height: 40px;
+            background-color: red;
+            position: absolute;
+            bottom: 0;
+            right: -20px;
+            display: none;
+        }
+        @keyframes moveObstacle {
+            from {
+                right: -20px;
+            }
+            to {
+                right: 100%;
+            }
+        }
+        .jump {
+            animation: jump 0.5s linear;
+        }
+        @keyframes jump {
+            0% { bottom: 0; }
+            50% { bottom: 80px; }
+            100% { bottom: 0; }
+        }
+        .score {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .game-over {
+            color: red;
+            font-size: 24px;
+            font-weight: bold;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Press Spacebar to Start!</h1>
+    <div class="score">Score: <span id="score">0</span></div>
+    <div class="game-container">
+        <div class="dino" id="dino"></div>
+        <div class="obstacle" id="obstacle"></div>
+    </div>
+    <div class="game-over" id="game-over">Game Over! Refresh to restart.</div>
+    <script>
+        let score = 0;
+        let isGameOver = false;
+        let isJumping = false;
+        let gameStarted = false;
+        let obstacle = document.getElementById("obstacle");
+        let dino = document.getElementById("dino");
+        let scoreElement = document.getElementById("score");
+        let gameOverElement = document.getElementById("game-over");
+
+        document.addEventListener("keydown", function(event) {
+            if (event.code === "Space") {
+                if (!gameStarted) {
+                    startGame();
+                }
+                if (!isJumping) {
+                    jump();
+                }
+            }
+        });
+
+        function startGame() {
+            gameStarted = true;
+            obstacle.style.display = "block";
+            obstacle.style.animation = "moveObstacle 2s infinite linear";
+            setInterval(updateScore, 2000);
+            setInterval(checkCollision, 100);
+        }
+
+        function jump() {
+            isJumping = true;
+            let position = 0;
+            let upInterval = setInterval(() => {
+                if (position >= 80) {
+                    clearInterval(upInterval);
+                    let downInterval = setInterval(() => {
+                        if (position <= 0) {
+                            clearInterval(downInterval);
+                            isJumping = false;
+                        }
+                        position -= 5;
+                        dino.style.bottom = position + "px";
+                    }, 20);
+                }
+                position += 5;
+                dino.style.bottom = position + "px";
+            }, 20);
+        }
+        
+        function updateScore() {
+            if (!isGameOver) {
+                score++;
+                scoreElement.textContent = score;
+            }
+        }
+        
+        function checkCollision() {
+            let dinoRect = dino.getBoundingClientRect();
+            let obstacleRect = obstacle.getBoundingClientRect();
+            
+            if (
+                dinoRect.right > obstacleRect.left &&
+                dinoRect.left < obstacleRect.right &&
+                dinoRect.bottom > obstacleRect.top
+            ) {
+                gameOver();
+            }
+        }
+        
+        function gameOver() {
+            gameOverElement.style.display = "block";
+            isGameOver = true;
+            obstacle.style.animation = "none";
+        }
+    </script>
+</body>
+</html>
